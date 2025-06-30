@@ -4,8 +4,14 @@ In this project, we build, deploy, and manage a Kubernetes cluster using RKE2 (R
 
 ## Prerequisites
 1. GCP Linux VMs as Cluster Nodes (1 control plane + 1 worker node)
-2. RKE v2
-3. Rancher UI
+2. GCP Firewall Rules
+3. RKE v2 (k3s-based kubernetes from Rancher)
+4. Helm
+5. Kubectl
+6. Rancher UI
+7. Certificate 
+8. Nginx App
+
 
 
 ## Create GCP Linux VMs
@@ -147,9 +153,9 @@ Copy & Save the rke2 Token for Registering Other Nodes
 ```sh
 sudo cat /var/lib/rancher/rke2/server/node-token
 ```
-It looks like this:
+It looks something like this:
 ```sh
-K10685ee9a59c125d6d9cb7b543542cf85c46895d063558f5f9bc5d677b036e4664::server:0810b3f5f2f6f07c916ad4dcdfaf71bb
+K10685ee9a59c125d6d9cb7b543542cf85cd05d677b036e4664::server:0810b3f5f2f6f07c916dfaf71bb
 ```
 
 
@@ -338,15 +344,22 @@ kubectl delete service ui-app
 ```sh
 helm uninstall rancher -n cattle-system
 helm uninstall cert-manager -n cert-manager
+```
+
+```sh
 kubectl delete ns cattle-system
 kubectl delete ns cert-manager
 ```
 
 ### Stop & Disable RKE2 Services (On both Nodes)
+On the Master Node:
 ```sh
 sudo systemctl stop rke2-server
 sudo systemctl disable rke2-server
+```
 
+On the Worker Node: 
+```sh
 sudo systemctl stop rke2-agent
 sudo systemctl disable rke2-agent
 ```
@@ -359,5 +372,4 @@ sudo /usr/local/bin/rke2-uninstall.sh || sudo /usr/bin/rke2-uninstall.sh
 1. Select your GCP VMs & Delete them
 2. Go to Firewall Rules or Policies, Select the firewall rules you created and delete. 
 3. Go to Compute Engine - Disks: to see that disks are deleted as well.
-
 
